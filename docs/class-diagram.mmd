@@ -1,0 +1,168 @@
+classDiagram
+    direction TB
+
+    class Main {
+        +main(args)$ void
+    }
+
+    class ParcelMenu {
+        -InputReader input
+        -ParcelManager manager
+        -DeliveryStrategy[] services
+        +ParcelMenu(InputReader input)
+        +run() void
+        -addParcel() void
+        -viewAllParcels() void
+        -changeDeliveryService() void
+        -markAsDelivered() void
+        -createParcel(answers) Parcel
+    }
+
+    class InputReader {
+        +String BACK$
+        -BufferedReader reader
+        +ask(String question, InputValidator validator) String
+        +isBack(String answer)$ boolean
+    }
+
+    class InputValidator {
+        <<interface>>
+        +validate(String input) void
+    }
+
+    class ParcelManager {
+        <<Singleton>>
+        -ParcelManager instance$
+        -Map~String, Parcel~ parcels
+        -ParcelManager()
+        +getInstance()$ ParcelManager
+        +checkTrackingNumberAvailable(String trackingNumber) void
+        +addParcel(Parcel parcel) void
+        +findParcel(String trackingNumber) Parcel
+        +findPendingParcel(String trackingNumber) Parcel
+        +getAllParcels() List~Parcel~
+        +changeDeliveryService(String trackingNumber, DeliveryStrategy newService) double
+        +markAsDelivered(String trackingNumber) void
+    }
+
+    class Parcel {
+        <<abstract>>
+        -String trackingNumber
+        -String receiverName
+        -double weight
+        -ParcelStatus status
+        -DeliveryStrategy deliveryStrategy
+        +Parcel(String trackingNumber, String receiverName, double weight)
+        +getType()* String
+        +getMaxWeight()* double
+        +getChargeableWeight()* double
+        +getBaseFee()* double
+        +getDeliveryFee() double
+        +setDeliveryStrategy(DeliveryStrategy newStrategy) void
+        +markDelivered() void
+        +isDelivered() boolean
+        +getTrackingNumber() String
+        +getReceiverName() String
+        +getWeight() double
+        +getStatus() ParcelStatus
+        +getDeliveryStrategy() DeliveryStrategy
+    }
+
+    class Document {
+        -int pages
+        +Document(trackingNumber, receiverName, weight, int pages)
+        +getPages() int
+        +getType() String
+        +getMaxWeight() double
+        +getChargeableWeight() double
+        +getBaseFee() double
+    }
+
+    class Box {
+        -int length
+        -int width
+        -int height
+        +Box(trackingNumber, receiverName, weight, int length, int width, int height)
+        +getVolumetricWeight() double
+        +getType() String
+        +getMaxWeight() double
+        +getChargeableWeight() double
+        +getBaseFee() double
+    }
+
+    class Fragile {
+        -String handlingNote
+        +Fragile(trackingNumber, receiverName, weight, length, width, height, String handlingNote)
+        +getHandlingNote() String
+        +getType() String
+        +getMaxWeight() double
+        +getChargeableWeight() double
+        +getBaseFee() double
+    }
+
+    class ParcelStatus {
+        <<enumeration>>
+        PENDING
+        DELIVERED
+    }
+
+    class DeliveryStrategy {
+        <<interface>>
+        +getName() String
+        +isAllowedFor(double chargeableWeight) boolean
+        +calculateFee(double baseFee) double
+    }
+
+    class StandardDelivery {
+        +calculateFee(double baseFee) double
+    }
+
+    class ExpressDelivery {
+        +calculateFee(double baseFee) double
+    }
+
+    class SameDayDelivery {
+        +double MAX_CHARGEABLE_WEIGHT$
+        +isAllowedFor(double chargeableWeight) boolean
+        +calculateFee(double baseFee) double
+    }
+
+    class Validator {
+        <<utility>>
+        +checkTrackingNumber(String)$ void
+        +checkReceiverName(String)$ void
+        +parseWeight(String, double, String)$ double
+        +parsePages(String)$ int
+        +parseDimension(String, String)$ int
+        +checkHandlingNote(String)$ void
+        +parseMenuChoice(String, int)$ int
+    }
+
+    class Formatter {
+        <<utility>>
+        +money(double)$ String
+        +weight(double)$ String
+        +pad(String, int)$ String
+        +pad(String, int, boolean)$ String
+    }
+
+    Parcel <|-- Document : extends
+    Parcel <|-- Box : extends
+    Box <|-- Fragile : extends
+    Parcel --> ParcelStatus : has
+    Parcel o--> DeliveryStrategy : uses (context)
+
+    DeliveryStrategy <|.. StandardDelivery : implements
+    DeliveryStrategy <|.. ExpressDelivery : implements
+    DeliveryStrategy <|.. SameDayDelivery : implements
+
+    ParcelManager "1" o--> "0..*" Parcel : stores
+    Main ..> ParcelMenu : creates
+    Main ..> InputReader : creates
+    ParcelMenu --> InputReader : reads answers
+    ParcelMenu --> ParcelManager : getInstance()
+    ParcelMenu --> DeliveryStrategy : chooses
+    InputReader ..> InputValidator : uses
+    Parcel ..> Validator : validates with
+    ParcelMenu ..> Validator : validates with
+    ParcelMenu ..> Formatter : formats with

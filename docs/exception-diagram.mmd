@@ -1,0 +1,56 @@
+classDiagram
+    direction TB
+
+    class Exception {
+        <<Java built-in, checked>>
+    }
+
+    class ParcelException {
+        +ParcelException(String message)
+        +ParcelException(String message, Throwable cause)
+    }
+
+    class InvalidParcelException {
+        -String fieldName
+        +InvalidParcelException(String fieldName, String message)
+        +InvalidParcelException(String fieldName, String message, Throwable cause)
+        +getFieldName() String
+    }
+
+    class InvalidInputException {
+        +InvalidInputException(String message)
+    }
+
+    class DuplicateTrackingNumberException {
+        -String trackingNumber
+        +DuplicateTrackingNumberException(String trackingNumber)
+        +getTrackingNumber() String
+    }
+
+    class ParcelNotFoundException {
+        +String MESSAGE$
+        -String trackingNumber
+        +ParcelNotFoundException(String trackingNumber)
+        +getTrackingNumber() String
+    }
+
+    class ParcelAlreadyDeliveredException {
+        -String trackingNumber
+        +ParcelAlreadyDeliveredException(String trackingNumber)
+        +getTrackingNumber() String
+    }
+
+    class SameDayNotAllowedException {
+        +String MESSAGE$
+        -double chargeableWeight
+        +SameDayNotAllowedException(double chargeableWeight)
+        +getChargeableWeight() double
+    }
+
+    Exception <|-- ParcelException
+    ParcelException <|-- InvalidParcelException
+    ParcelException <|-- InvalidInputException
+    ParcelException <|-- DuplicateTrackingNumberException
+    ParcelException <|-- ParcelNotFoundException
+    ParcelException <|-- ParcelAlreadyDeliveredException
+    ParcelException <|-- SameDayNotAllowedException

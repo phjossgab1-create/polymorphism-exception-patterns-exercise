@@ -1,0 +1,8 @@
+# Compiled class files (VS Code builds them into bin/)
+bin/
+out/
+*.class
+
+# OS / editor files
+.DS_Store
+Thumbs.db
